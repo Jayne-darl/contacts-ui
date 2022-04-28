@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  ChakraProvider,
-  Container,
-  Box,
-  Text,
-  Link,
-  VStack,
-  Code,
-  Grid,
-  theme,
-} from '@chakra-ui/react';
+import { ChakraProvider, Box, Grid, theme } from '@chakra-ui/react';
 import Home from '../src/components/home';
 
 function App() {
