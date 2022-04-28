@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useToast, Box, Text, Skeleton, Flex, Spacer } from '@chakra-ui/react';
+import { useToast, Box, Text, Skeleton, Flex, Divider } from '@chakra-ui/react';
 import axios from 'axios';
 import CustomModal from './customModal';
 
@@ -50,23 +50,32 @@ function ViewAContact(props) {
     >
       <Skeleton size="20" isLoaded={!fetching}>
         <Box fontSize="sm">
-          <Flex gap="2">
-            <Text fontWeight="semibold">Name:</Text>
-            <Text>{`${contact.firstName}  ${contact.lastName}`}</Text>
-          </Flex>
-          <Flex gap="2">
-            <Text fontWeight="semibold">Email:</Text>
-            <Text>{contact.email}</Text>
-          </Flex>
-          <Flex gap="2">
-            <Text fontWeight="semibold">Phone:</Text>
-            <Text>{contact.phoneNumber}</Text>
-          </Flex>
-          <Flex gap="2">
-            <Text fontWeight="semibold">Created At:</Text>
-            <Text>{formatDate(contact.createdAt)}</Text>
-          </Flex>
-          <Spacer />
+          <Box
+            shadow="md"
+            w="100%"
+            textAlign="left"
+            pl="5"
+            py="3"
+            borderWidth="1px"
+          >
+            <Flex gap="2">
+              <Text fontWeight="semibold">Name:</Text>
+              <Text>{`${contact.firstName}  ${contact.lastName}`}</Text>
+            </Flex>
+            <Flex gap="2">
+              <Text fontWeight="semibold">Email:</Text>
+              <Text>{contact.email}</Text>
+            </Flex>
+            <Flex gap="2">
+              <Text fontWeight="semibold">Phone:</Text>
+              <Text>{contact.phoneNumber}</Text>
+            </Flex>
+            <Divider />
+            <Flex gap="2" pt="3">
+              <Text fontWeight="semibold">Created At:</Text>
+              <Text>{formatDate(contact.createdAt)}</Text>
+            </Flex>
+          </Box>
           {edits.length > 0 && (
             <>
               <Text
@@ -87,13 +96,18 @@ function ViewAContact(props) {
                     textAlign="left"
                     pl="5"
                     py="3"
+                    mb="1"
                     borderWidth="1px"
                     key={edit._id}
                   >
                     <Text>{`${edit?.firstName}  ${edit?.lastName}`}</Text>
                     <Text>{edit.email}</Text>
                     <Text>{edit.phoneNumber}</Text>
-                    <Text>{createdAt}</Text>
+                    <Divider />
+                    <Flex gap="2" pt="3">
+                      <Text fontWeight="semibold">Edited At:</Text>
+                      <Text>{createdAt}</Text>
+                    </Flex>
                   </Box>
                 );
               })}
