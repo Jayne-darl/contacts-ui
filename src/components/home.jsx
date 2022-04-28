@@ -15,6 +15,7 @@ import {
   Flex,
   Box,
   Text,
+  Skeleton,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { RiDeleteBin6Line } from 'react-icons/ri';
@@ -26,6 +27,7 @@ import DeleteAlertModal from './deleteAlertModal';
 import ViewAContact from './viewAContact';
 
 function Home() {
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [contact, setContact] = useState(null);
   const [contactToDelete, setContactToDelete] = useState(null);
@@ -39,9 +41,11 @@ function Home() {
   const getContacts = useCallback(async () => {
     const baseURL = process.env.REACT_APP_BASE_URL;
     try {
+      setIsLoadingContacts(true);
       const response = await axios.get(`${baseURL}/contact`);
       const contacts = response.data.data;
       setContacts(contacts);
+      setIsLoadingContacts(false);
     } catch (error) {
       toast({
         title: 'Oops! Something went wrong.',
@@ -49,6 +53,7 @@ function Home() {
         description: error.response?.data?.message || error.message,
         position: 'top',
       });
+      setIsLoadingContacts(false);
       console.error(error);
     }
   }, [toast]);
@@ -59,122 +64,126 @@ function Home() {
 
   if (isBigScreen) {
     return (
-      <Box mx={12} mt={4}>
-        <TableContainer>
-          <Flex justifyContent="flex-end">
-            <Button
-              onClick={() => setShowCreateForm(true)}
-              w={200}
-              isFullWidth={false}
-              colorScheme="teal"
-            >
-              Add a New Contact
-            </Button>
-          </Flex>
-          {contacts.length > 0 && (
-            <Table variant="striped" colorScheme="teal">
-              <TableCaption placement="top">
-                <Text fontSize="3xl">{contacts.length} Contact(s) </Text>
-              </TableCaption>
-              <Thead>
-                <Tr>
-                  <Th>Name</Th>
-                  <Th>Email</Th>
-                  <Th>Phone Number</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {contacts.map(contact => (
-                  <Tr key={contact._id}>
-                    <Td>{`${contact.firstName}  ${contact.lastName}`}</Td>
-                    <Td>{contact.email}</Td>
-                    <Td>{contact.phoneNumber}</Td>
-                    <Td>
-                      <IconButton
-                        aria-label="Edit Contact"
-                        size="sm"
-                        variant="link"
-                        icon={
-                          <GrEdit
-                            onClick={() => {
-                              setContact(contact);
-                            }}
-                          />
-                        }
-                      />
-                      <IconButton
-                        colorScheme="red"
-                        size="sm"
-                        variant="link"
-                        aria-label="Delete Contact"
-                        icon={
-                          <RiDeleteBin6Line
-                            onClick={() => {
-                              setContactToDelete(contact);
-                            }}
-                          />
-                        }
-                      />
-                    </Td>
-                    <Td>
-                      <Button
-                        variant="link"
-                        onClick={() => {
-                          setSelectedContactID(contact._id);
-                        }}
-                      >
-                        Details
-                      </Button>
-                    </Td>
+      <Skeleton size="20" isLoaded={!isLoadingContacts}>
+        <Box mx={12} mt={4}>
+          <TableContainer>
+            <Flex justifyContent="flex-end">
+              <Button
+                onClick={() => setShowCreateForm(true)}
+                w={200}
+                isFullWidth={false}
+                colorScheme="teal"
+              >
+                Add a New Contact
+              </Button>
+            </Flex>
+            {contacts.length > 0 && (
+              <Table variant="striped" colorScheme="teal">
+                <TableCaption placement="top">
+                  <Text fontSize="3xl">{contacts.length} Contact(s) </Text>
+                </TableCaption>
+                <Thead>
+                  <Tr>
+                    <Th>Name</Th>
+                    <Th>Email</Th>
+                    <Th>Phone Number</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          )}
-        </TableContainer>
-        <EditContact
-          isOpen={!!contact}
-          onClose={() => {
-            setContact(null);
-            setReload(Math.random());
-          }}
-          contact={contact}
-        />
-        <CreateContact
-          isOpen={showCreateForm}
-          onClose={() => {
-            setShowCreateForm(false);
-            setReload(Math.random());
-          }}
-        />
-        <DeleteAlertModal
-          isOpen={!!contactToDelete}
-          onClose={() => {
-            setContactToDelete(null);
-            setReload(Math.random());
-          }}
-          contact={contactToDelete}
-        />
-
-        {selectedContactID !== null && (
-          <ViewAContact
-            isOpen={!!selectedContactID}
+                </Thead>
+                <Tbody>
+                  {contacts.map(contact => (
+                    <Tr key={contact._id}>
+                      <Td>{`${contact.firstName}  ${contact.lastName}`}</Td>
+                      <Td>{contact.email}</Td>
+                      <Td>{contact.phoneNumber}</Td>
+                      <Td>
+                        <IconButton
+                          aria-label="Edit Contact"
+                          size="sm"
+                          variant="link"
+                          icon={
+                            <GrEdit
+                              onClick={() => {
+                                setContact(contact);
+                              }}
+                            />
+                          }
+                        />
+                        <IconButton
+                          colorScheme="red"
+                          size="sm"
+                          variant="link"
+                          aria-label="Delete Contact"
+                          icon={
+                            <RiDeleteBin6Line
+                              onClick={() => {
+                                setContactToDelete(contact);
+                              }}
+                            />
+                          }
+                        />
+                      </Td>
+                      <Td>
+                        <Button
+                          variant="link"
+                          onClick={() => {
+                            setSelectedContactID(contact._id);
+                          }}
+                        >
+                          Details
+                        </Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            )}
+          </TableContainer>
+          <EditContact
+            isOpen={!!contact}
             onClose={() => {
-              setSelectedContactID(null);
+              setContact(null);
+              setReload(Math.random());
             }}
-            contactID={selectedContactID}
+            contact={contact}
           />
-        )}
-      </Box>
+          <CreateContact
+            isOpen={showCreateForm}
+            onClose={() => {
+              setShowCreateForm(false);
+              setReload(Math.random());
+            }}
+          />
+          <DeleteAlertModal
+            isOpen={!!contactToDelete}
+            onClose={() => {
+              setContactToDelete(null);
+              setReload(Math.random());
+            }}
+            contact={contactToDelete}
+          />
+
+          {selectedContactID !== null && (
+            <ViewAContact
+              isOpen={!!selectedContactID}
+              onClose={() => {
+                setSelectedContactID(null);
+              }}
+              contactID={selectedContactID}
+            />
+          )}
+        </Box>
+      </Skeleton>
     );
   }
   return (
-    <MobileHome
-      contacts={contacts}
-      refresh={() => {
-        setReload(Math.random());
-      }}
-    />
+    <Skeleton size="20" isLoaded={!isLoadingContacts}>
+      <MobileHome
+        contacts={contacts}
+        refresh={() => {
+          setReload(Math.random());
+        }}
+      />
+    </Skeleton>
   );
 }
 
